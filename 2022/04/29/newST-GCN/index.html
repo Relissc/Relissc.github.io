@@ -215,7 +215,7 @@
 <center>石破天惊先河创，人人传颂美名扬；</center>
 <center>动作识别新方向，图形卷积来登场。</center>
 </blockquote>
-<p>​        图卷积由于其对非欧几里得数据建模的独特优势，其被广泛用于骨架动作识别任务之中。在本文中，我将对2018年AAAI会议中的一个工作ST-GCN进行重述，作为图卷积在基于骨架动作识别任务中的开山之作，其文章故事圆满，角度新颖；其代码实现优雅，结构清晰；而其最终的结果也着实优秀，对后续工作具有很好的指导作用。</p>
+<p> 图卷积由于其对非欧几里得数据建模的独特优势，其被广泛用于骨架动作识别任务之中。在本文中，我将对2018年AAAI会议中的一个工作ST-GCN进行重述，作为图卷积在基于骨架动作识别任务中的开山之作，其文章故事圆满，角度新颖；其代码实现优雅，结构清晰；而其最终的结果也着实优秀，对后续工作具有很好的指导作用。</p>
 <h1 id="一、摘要"><a href="#一、摘要" class="headerlink" title="一、摘要"></a>一、摘要</h1><p>​        在基于骨架的动作识别任务中，动态的人体骨架具有该任务所需的重要信息，然而以往传统的方法通常使用手工特征或遍历规则对骨架进行建模，不仅限制了模型表达能力还使得模型泛化困难；因此作者提出了一个新颖的动态骨架模型ST-GCN，它可以从数据中自动学习其空间和时间的模式，实现了信息在时空维度的集成，并使得模型具有很强的表达能力和泛化能力。该模型在Kinetics和NTU-RGB+D两个骨架识别数据集上与主流方法相比，取得了质的提升。</p>
 <h1 id="二、引言"><a href="#二、引言" class="headerlink" title="二、引言"></a>二、引言</h1><p>人体动作识别在近年来是研究热点，大家使用外观、深度、光流、身体骨架等数据模式来完成该任务，然而却忽略了带有大量重要信息的动态人体骨架，因此作者系统地在该模态下进行研究，有原则、高效的方法对动态人体骨架建模。</p>
 <p>以往利用骨架数据都是简单的使用其各个时间帧上的2D或3D关节坐标来构成特征向量，再对其进行时序分析，这种方法具有巨大的局限性：未利用至关重要的关节空间关系；不同于这些方法，作者使用关节的自然连接构建出骨架图，并利用神经网络自动捕捉空间结构和时序动态。关于神经网络类型的选择，不同于以往使用规则的、网格结构的欧几里得数据作为网络的输入的方式，自然连接的骨架图输入是一个不规则的图形数据，因此使用图卷积自然比传统卷积神经网络CNN具有天然的优势。</p>
@@ -227,74 +227,72 @@
 <p>​            2】基于空域（spatial perspective）的图卷积方法：直接对图结构进行卷积，操作方便。</p>
 <p>​        在本文中，作者使用空域图卷积方式。</p>
 <h2 id="2、基于骨架的动作识别"><a href="#2、基于骨架的动作识别" class="headerlink" title="2、基于骨架的动作识别"></a>2、基于骨架的动作识别</h2><p>​        基于骨架动作识别主要可以分为两大类：</p>
-<p>​            1】基于手工特征的方法：即使用手动设计的特征关节运动的动态信息；主要的手工特征有：关节轨迹的协方差矩阵、关节相对位                  置或圣体部位之间的旋转与平移；</p>
-<p>​            2】基于手工特征的方法：即使用手动设计的特征关节运动的动态信息；主要的手工特征有：关节轨迹的协方差矩阵、关节相对位                  置或圣体部位之间的旋转与平移；</p>
+<p>​            1】基于手工特征的方法：即使用手动设计的特征关节运动的动态信息；主要的手工特征有：关节轨迹的协方差矩阵、关节相对位置或圣体部位之间的旋转与平移；</p>
+<p>​            2】基于手工特征的方法：即使用手动设计的特征关节运动的动态信息；主要的手工特征有：关节轨迹的协方差矩阵、关节相对位置或圣体部位之间的旋转与平移；</p>
 <p>​        在本文中，作者提出的ST-GCN首次使用图卷积神经网络(GCN)，使其可以利用图卷积的局部性和时序动态信息更好更方便的学习人体动作的表示。</p>
 <h1 id="四、时空图卷积网络"><a href="#四、时空图卷积网络" class="headerlink" title="四、时空图卷积网络"></a>四、时空图卷积网络</h1><p>​        现有方法已经证明了身体部位的局部信息对骨架动作识别任务十分有效，因此作者便引用此方法中的骨架序列表示的层次性和局部性，使用神经网络进行实现，从而构建出了基于骨架动作识别任务上的ST-GCN模型。</p>
 <h2 id="1、模型流程概述"><a href="#1、模型流程概述" class="headerlink" title="1、模型流程概述"></a>1、模型流程概述</h2><p>​        如图1所示，在ST-GCN网络中：首先使用姿态估计方法从普通视频数据中获取骨架数据，并利用该数据构建出时空骨架序列图作为时空图卷积网络ST-GCN的输入；之后使用多层时空图卷积网络进行卷积，逐步在图上生成更高层次的特征图；最后用标准的Softmax分类器将其分类为相应的动作类别，整个模型通过反向传播以端到端的方式进行训练。</p>
-<p><img src="/2022/04/29/ST-GCN/ST-GCN.png" alt="图1 ST-GCN网络"></p>
-<center>图1 ST-GCN网络</center>
-
-<h2 id="2、构造骨架图"><a href="#2、构造骨架图" class="headerlink" title="2、构造骨架图"></a>2、构造骨架图</h2><p>​        在ST-GCN中，令拥有N个节点和帧的骨架序列时空图定义为G={V,E}，其可视化后如图1所示；其中：</p>
+<p><img src="/2022/04/29/newST-GCN/ST-GCN-16512350544221.png" alt="图1 ST-GCN网络"></p>
+<p>在ST-GCN中，令拥有N个节点和帧的骨架序列时空图定义为G={V,E}，其可视化后如图1所示；其中：</p>
 <p><img src="https://img-blog.csdnimg.cn/96f9fe92e1ca46efb434ac1ecb750080.png" alt="img"></p>
 <p>​        其中的节点集合为V，且其中的第 <em>t</em> 帧的第 <em>i</em> 节点的特征向量F(Vti)有：</p>
 <p>​        若使用openpose提取的骨架数据，则其F(Vti)为该节点的坐标向量和估计置信度组成；而Kinetics和NTU-RGB+D数据集的F(Vti)为该节点的坐标向量。</p>
 <p>​        其中的边集合包括Es和ET，分别指空间边(spatial edges)和时序边(temporal edges)；H指一组自然连接的人体关节。</p>
-<img src="/2022/04/29/ST-GCN/stGraph.png" alt="stGraph" style="zoom:50%;">
+<img src="/2022/04/29/newST-GCN/stGraph-16512350946452.png" alt="stGraph" style="zoom:50%;">
 
 <center>图2 骨架序列时空图</center>
 
-<h2 id="3、骨架图的子集划分"><a href="#3、骨架图的子集划分" class="headerlink" title="3、骨架图的子集划分"></a>3、骨架图的子集划分</h2><p>​        在构架好骨架图后，作者对其进行了图划分操作（如图2所示,其中图2-(a)为普通骨架图），从而可以使用多种卷积核进行卷积。本文中作者使用的划分策略为空间结构划分方式(Spatial configuration partitioning)（如图2-(d)所示），将其结构图邻接矩阵划分为3个子矩阵，即意味着将结构图划分3个子图：其中第一个子集连接了空间位置上比根节点更远离整个骨架的邻居节点，第二个子集连接了更靠近中心的邻居节点，第三个子集为根节点本身，分别表示了离心运动、向心运动和静止的运动特征。除了这种划分方式外，作者还分别尝试了唯一划分(Uni-labeling partitioning)方式（如图2-(b)所示）：将节点的邻居节点划分为一个子集和基于距离的划分 (Distance partitioning)方式（如图2-(c)所示）：将节点的邻居节点和根节点划分为2个子集；但实验效果均不佳。<br><img src="/2022/04/29/ST-GCN/fenqu.png" alt="fenqu"></p>
+<h2 id="3、骨架图的子集划分"><a href="#3、骨架图的子集划分" class="headerlink" title="3、骨架图的子集划分"></a>3、骨架图的子集划分</h2><p>​        在构架好骨架图后，作者对其进行了图划分操作（如图2所示,其中图2-(a)为普通骨架图），从而可以使用多种卷积核进行卷积。本文中作者使用的划分策略为空间结构划分方式(Spatial configuration partitioning)（如图2-(d)所示），将其结构图邻接矩阵划分为3个子矩阵，即意味着将结构图划分3个子图：其中第一个子集连接了空间位置上比根节点更远离整个骨架的邻居节点，第二个子集连接了更靠近中心的邻居节点，第三个子集为根节点本身，分别表示了离心运动、向心运动和静止的运动特征。除了这种划分方式外，作者还分别尝试了唯一划分(Uni-labeling partitioning)方式（如图2-(b)所示）：将节点的邻居节点划分为一个子集和基于距离的划分 (Distance partitioning)方式（如图2-(c)所示）：将节点的邻居节点和根节点划分为2个子集；但实验效果均不佳。<br><img src="/2022/04/29/newST-GCN/fenqu-16512350946463.png" alt="fenqu"></p>
 <center>图3 骨架图分区策略</center>
 
 <h2 id="4、时空图卷积网络"><a href="#4、时空图卷积网络" class="headerlink" title="4、时空图卷积网络"></a>4、时空图卷积网络</h2><p>​        在介绍图卷积之前，作者先以CNN在单帧骨架图输入的卷积举例，并对其卷积公式进行推广概括，得到更加通用的卷积公式，即给定一个核大小为K×K的卷积算子、输入特征映射 $x_i$ 和通道数 $c$ ；空间位置 x 在单个通道的卷积输出可以定义为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175100613.png" alt="image-20220429175100613" style="zoom:70%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175100613-16512350946464.png" alt="image-20220429175100613" style="zoom:70%;">
 
 <div style="text-align: right">(1)</div>
 
 <p>​        其中采样函数<img src="https://img-blog.csdnimg.cn/ef227d42856a47a7b5b5758eb1962073.png" alt="img">，即根据卷积核采样出进行卷积操作的特征点，在骨架图中枚举出该位置<img src="https://img-blog.csdnimg.cn/388e93c42b81489a9478732c5d89a454.png" alt="img">的邻居。而权重函数<img src="https://img-blog.csdnimg.cn/f6513daa44654e23b38642eae9024e29.png" alt="img">提供进行卷积的权重向量，用来与采样出的<img src="https://img-blog.csdnimg.cn/9cdd0da432c24112be171a4404d4a8aa.png" alt="img">维特征向量计算内积。</p>
 <p>​        在空域图卷积中，空间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/bf023d1ccc8245f091c8c920aa502114.png" alt="img">，若节点<img src="https://img-blog.csdnimg.cn/a8203ac726074995b06ea2c337add1e7.png" alt="img">和<img src="https://img-blog.csdnimg.cn/9b618186e9d74ad690643b149808c40c.png" alt="img">直接相连，则<img src="https://img-blog.csdnimg.cn/8d3ae87747534d6fb18edb37b6c9ef1f.png" alt="img">，其余为0；以此来表示空间域图结构；</p>
 <p>其采样函数<img src="https://img-blog.csdnimg.cn/0e7aa60ab6b8486887ab4478cc5fa166.png" alt="img">可写成：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175212819.png" alt="image-20220429175212819" style="zoom:70%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175212819-16512350946465.png" alt="image-20220429175212819" style="zoom:70%;">
 
 <div style="text-align: right">(2)</div>
 
 <p>​        其中<img src="https://img-blog.csdnimg.cn/fe553ba17026412d8708a1ea6c4eb15a.png" alt="img">表示<img src="https://img-blog.csdnimg.cn/ba62cfa1b1af4cff95ef451cb9113bcf.png" alt="img">到<img src="https://img-blog.csdnimg.cn/355db59e1aa6460799dc3ae197072841.png" alt="img">的最短路径，参数<img src="https://img-blog.csdnimg.cn/abafcf621dde49d2b20af625d50ee553.png" alt="img">控制所采样的邻居图的空间范围。</p>
 <p>​        并且由上述作者将邻居划分为3个子图，并且将每个子图中的每个节点<img src="https://img-blog.csdnimg.cn/997bbb0421af437286960b052c434cc1.png" alt="img">分别通过映射函数<img src="https://img-blog.csdnimg.cn/a04378f307d841c2a0590b57ebcf1eb6.png" alt="img">映射到其子集标签<img src="https://img-blog.csdnimg.cn/52aaf94fdf064f5ea4a6c2270493ac53.png" alt="img">，即将邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/3083fd056128422090ca340cc4f99c99.png" alt="img">、<img src="https://img-blog.csdnimg.cn/e4837ce7d70e49e5a51a9ac19c49e816.png" alt="img">和<img src="https://img-blog.csdnimg.cn/6b2f48df810943009fb1a9b7b7619479.png" alt="img">，分别代表根节点、向心运动特征节点和离心运动特征节点；则其权重函数<img src="https://img-blog.csdnimg.cn/f75a11fc50b745e1b1327acd8d7cca00.png" alt="img">可写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175302299.png" alt="image-20220429175302299" style="zoom:70%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175302299-16512350946466.png" alt="image-20220429175302299" style="zoom:70%;">
 
 <div style="text-align: right">(3)</div>
 
 <p>​        因此，在空间域上的图卷积公式可写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175336035.png" alt="image-20220429175336035" style="zoom:80%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175336035-16512350946467.png" alt="image-20220429175336035" style="zoom:80%;">
 
 <div style="text-align: right">(4)</div>
 
 <p>​        同理，在时间域中，其时间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/6e4bd7149d7a4d74a2f75842eab458f0.png" alt="img">，用来表示连续帧之间关节的轨迹。</p>
 <p>​        其采样函数<img src="https://img-blog.csdnimg.cn/9de33cb77d794c689a697fe65705fba8.png" alt="img">可写成：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175407811.png" alt="image-20220429175407811" style="zoom:67%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175407811-16512350946468.png" alt="image-20220429175407811" style="zoom:67%;">
 
 <div style="text-align: right">(5)</div>
 
 <p>​        其中<img src="https://img-blog.csdnimg.cn/ff58a310517840608555e5c4e538cd8e.png" alt="img">控制时间域卷积的卷积范围，即需要聚合的时间尺度，并且通过简单的映射函数<img src="https://img-blog.csdnimg.cn/c0198c809db043ea8aca222760db5e30.png" alt="img">，将时域邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/4b06fee09d574298b810d0e58c96d8b8.png" alt="img">份：<img src="https://img-blog.csdnimg.cn/72ac13331ac34fbe8904e29b4f545d53.png" alt="img">；故其权重函数<img src="https://img-blog.csdnimg.cn/ac8d3cce9d0849078e1048da4ee4500b.png" alt="img">可写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175436163.png" alt="image-20220429175436163" style="zoom:67%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175436163-16512350946469.png" alt="image-20220429175436163" style="zoom:67%;">
 
 <div style="text-align: right">(6)</div>
 
 <p>​        所以，在时间域上的卷积公式可写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175506787.png" alt="image-20220429175506787" style="zoom:80%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175506787-165123509464610.png" alt="image-20220429175506787" style="zoom:80%;">
 
 <div style="text-align: right">(7)</div>
 
 <p>​        基于上述描述，我们就可以构建出时空域图卷积的明确的卷积算子。</p>
 <h1 id="五、ST-GCN网络实现"><a href="#五、ST-GCN网络实现" class="headerlink" title="五、ST-GCN网络实现"></a>五、ST-GCN网络实现</h1><p>​        在构建完成时空域的图卷积算子之后，接下来作者便构建了具体实现ST-GCN的具体实现方式：令输入特征图<img src="https://img-blog.csdnimg.cn/6ad8a034e5794a4392eacee5b24ff8df.png" alt="img">，其中<img src="https://img-blog.csdnimg.cn/b452c98b546a4d7d9a5e5631f2f5729e.png" alt="img">分别表示输入通道数、关键帧帧数和关节点数量；为实现ST-GCN，则公式(4)序改写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175533923.png" alt="image-20220429175533923" style="zoom:67%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175533923-165123511042811.png" alt="image-20220429175533923" style="zoom:67%;">
 
 <div style="text-align: right">(8)</div>
 
 <p>​        其中：<img src="https://img-blog.csdnimg.cn/3f00c6a18d0d4a9abbe53a60532b7d61.png" alt="img">指第<img src="https://img-blog.csdnimg.cn/5752d8d39f2c4853b43233c697527617.png" alt="img">个分区的归一化邻接矩阵；且<img src="https://img-blog.csdnimg.cn/238b16d6223e469bb56cea97c60d58f0.png" alt="img">为度矩阵，<img src="https://img-blog.csdnimg.cn/414577c61f8647a39cfc260355311311.png" alt="img">设置为0.001，避免空行。<img src="https://img-blog.csdnimg.cn/ac98e882074d40f08e6a9926b7a11b4e.png" alt="img">是<img src="https://img-blog.csdnimg.cn/5b892155a3164efba406dc00dbb2100e.png" alt="img">卷积运算的可训练权重向量。<img src="https://img-blog.csdnimg.cn/46891c2cf8454cdfbd6da66a50ad53e1.png" alt="img">是一个简单的注意力掩膜矩阵，代表每个关节的重要性；<img src="https://img-blog.csdnimg.cn/1d6447529a28449a998759e0b94426e1.png" alt="img">为点积操作。</p>
 <p>​        对于时间卷积而言，其卷积公式(7)可改写为：</p>
-<img src="/2022/04/29/ST-GCN/image-20220429175559099.png" alt="image-20220429175559099" style="zoom:67%;">
+<img src="/2022/04/29/newST-GCN/image-20220429175559099-165123511042912.png" alt="image-20220429175559099" style="zoom:67%;">
 
 <div style="text-align: right">(9)</div>
 
@@ -308,11 +306,11 @@
 <p>​        Cross-Subject(X-Sub)：按照人物ID来划分训练集和测试集，训练集40320个样本，测试集16560个样本，其中将人物ID为 1, 2, 4, 5, 8, 9, 13, 14, 15,16, 17, 18, 19, 25, 27, 28, 31, 34, 35, 38的20人作为训练集，剩余的作为测试集；即训练样本来自一个演员子集，而使用剩余演员的样本进行评估；</p>
 <p>​        Cross-View(X-View)：按相机ID来划分训练集和测试集，相机1采集的样本作为测试集，相机2和3的样本作为训练集，样本数分别为18960和37920。其中相机的设置规则为：三个相机，相机的垂直高度都是一样的，水平角度分别为-45°、0°和45°。</p>
 <h2 id="2、实验结果"><a href="#2、实验结果" class="headerlink" title="2、实验结果"></a>2、实验结果</h2><p>​        如图4，图5所示，分别ST-GCN在Kinetics和NTU-RGB+D数据集上的动作识别准确率。</p>
-<img src="/2022/04/29/ST-GCN/Users\caolijing\AppData\Roaming\Typora\typora-user-images\image-20220429165527483.png" alt="image-20220429165527483" style="zoom:50%;">
+<img src="/2022/04/29/newST-GCN/image-20220429165527483.png" alt="image-20220429165527483" style="zoom:50%;">
 
 <center>图4 ST-GCN在Kinetics数据集的准确率</center>
 
-<img src="/2022/04/29/ST-GCN/Users\caolijing\AppData\Roaming\Typora\typora-user-images\image-20220429165634253.png" alt="image-20220429165634253" style="zoom:50%;">
+<img src="/2022/04/29/newST-GCN/image-20220429165634253.png" alt="image-20220429165634253" style="zoom:50%;">
 
 <center>图5 ST-GCN在NTU-RGB+D数据集的准确率</center>
 
@@ -345,7 +343,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2022/04/29/ST-GCN/">http://example.com/2022/04/29/ST-GCN/</a></span>
+                        <span><a href="http://example.com/2022/04/29/newST-GCN/">http://example.com/2022/04/29/newST-GCN/</a></span>
                     </p>
                 
                 
@@ -382,8 +380,10 @@
         </section>
         <section class="post-nav">
             
+                <a class="prev" rel="prev" href="/2022/04/29/ST-GCN/">【论文阅读】AAAI2018||ST-GCN：Spatial Temporal Graph Convolutional Networks for Skeleton-Based Action Recognition</a>
             
-            <a class="next" rel="next" href="/2022/04/29/newST-GCN/">【论文阅读】AAAI2018||ST-GCN：Spatial Temporal Graph Convolutional Networks for Skeleton-Based Action Recognition</a>
+            
+            <a class="next" rel="next" href="/2022/03/28/hello-world/">Hello World</a>
             
         </section>
 
