@@ -240,7 +240,7 @@
 <p>​        其中的节点集合为V，且其中的第 <em>t</em> 帧的第 <em>i</em> 节点的特征向量F(Vti)有：</p>
 <p>​        若使用openpose提取的骨架数据，则其F(Vti)为该节点的坐标向量和估计置信度组成；而Kinetics和NTU-RGB+D数据集的F(Vti)为该节点的坐标向量。</p>
 <p>​        其中的边集合包括Es和ET，分别指空间边(spatial edges)和时序边(temporal edges)；H指一组自然连接的人体关节。</p>
-<img src="ST-GCN/stGraph.png" alt="stGraph" style="zoom:50%;" />
+<img src="./ST-GCN/stGraph.png" alt="stGraph" style="zoom:50%;" />
 
 <center>图2 骨架序列时空图</center>
 
@@ -248,53 +248,53 @@
 <center>图3 骨架图分区策略</center>
 
 <h2 id="4、时空图卷积网络"><a href="#4、时空图卷积网络" class="headerlink" title="4、时空图卷积网络"></a>4、时空图卷积网络</h2><p>​        在介绍图卷积之前，作者先以CNN在单帧骨架图输入的卷积举例，并对其卷积公式进行推广概括，得到更加通用的卷积公式，即给定一个核大小为K×K的卷积算子、输入特征映射 $x_i$ 和通道数 $c$ ；空间位置 x 在单个通道的卷积输出可以定义为：</p>
-<img src="ST-GCN/image-20220429175100613.png" alt="image-20220429175100613" style="zoom:70%;" />
+<img src="./ST-GCN/image-20220429175100613.png" alt="image-20220429175100613" style="zoom:70%;" />
 
 <div style="text-align: right">(1)</div>
 
 <p>​        其中采样函数<img src="https://img-blog.csdnimg.cn/ef227d42856a47a7b5b5758eb1962073.png" alt="img">，即根据卷积核采样出进行卷积操作的特征点，在骨架图中枚举出该位置<img src="https://img-blog.csdnimg.cn/388e93c42b81489a9478732c5d89a454.png" alt="img">的邻居。而权重函数<img src="https://img-blog.csdnimg.cn/f6513daa44654e23b38642eae9024e29.png" alt="img">提供进行卷积的权重向量，用来与采样出的<img src="https://img-blog.csdnimg.cn/9cdd0da432c24112be171a4404d4a8aa.png" alt="img">维特征向量计算内积。</p>
 <p>​        在空域图卷积中，空间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/bf023d1ccc8245f091c8c920aa502114.png" alt="img">，若节点<img src="https://img-blog.csdnimg.cn/a8203ac726074995b06ea2c337add1e7.png" alt="img">和<img src="https://img-blog.csdnimg.cn/9b618186e9d74ad690643b149808c40c.png" alt="img">直接相连，则<img src="https://img-blog.csdnimg.cn/8d3ae87747534d6fb18edb37b6c9ef1f.png" alt="img">，其余为0；以此来表示空间域图结构；</p>
 <p>其采样函数<img src="https://img-blog.csdnimg.cn/0e7aa60ab6b8486887ab4478cc5fa166.png" alt="img">可写成：</p>
-<img src="ST-GCN/image-20220429175212819.png" alt="image-20220429175212819" style="zoom:70%;" />
+<img src="./ST-GCN/image-20220429175212819.png" alt="image-20220429175212819" style="zoom:70%;" />
 
 <div style="text-align: right">(2)</div>
 
 <p>​        其中<img src="https://img-blog.csdnimg.cn/fe553ba17026412d8708a1ea6c4eb15a.png" alt="img">表示<img src="https://img-blog.csdnimg.cn/ba62cfa1b1af4cff95ef451cb9113bcf.png" alt="img">到<img src="https://img-blog.csdnimg.cn/355db59e1aa6460799dc3ae197072841.png" alt="img">的最短路径，参数<img src="https://img-blog.csdnimg.cn/abafcf621dde49d2b20af625d50ee553.png" alt="img">控制所采样的邻居图的空间范围。</p>
 <p>​        并且由上述作者将邻居划分为3个子图，并且将每个子图中的每个节点<img src="https://img-blog.csdnimg.cn/997bbb0421af437286960b052c434cc1.png" alt="img">分别通过映射函数<img src="https://img-blog.csdnimg.cn/a04378f307d841c2a0590b57ebcf1eb6.png" alt="img">映射到其子集标签<img src="https://img-blog.csdnimg.cn/52aaf94fdf064f5ea4a6c2270493ac53.png" alt="img">，即将邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/3083fd056128422090ca340cc4f99c99.png" alt="img">、<img src="https://img-blog.csdnimg.cn/e4837ce7d70e49e5a51a9ac19c49e816.png" alt="img">和<img src="https://img-blog.csdnimg.cn/6b2f48df810943009fb1a9b7b7619479.png" alt="img">，分别代表根节点、向心运动特征节点和离心运动特征节点；则其权重函数<img src="https://img-blog.csdnimg.cn/f75a11fc50b745e1b1327acd8d7cca00.png" alt="img">可写为：</p>
-<img src="ST-GCN/image-20220429175302299.png" alt="image-20220429175302299" style="zoom:70%;" />
+<img src="./ST-GCN/image-20220429175302299.png" alt="image-20220429175302299" style="zoom:70%;" />
 
 <div style="text-align: right">(3)</div>
 
 <p>​        因此，在空间域上的图卷积公式可写为：</p>
-<img src="ST-GCN/image-20220429175336035.png" alt="image-20220429175336035" style="zoom:80%;" />
+<img src="./ST-GCN/image-20220429175336035.png" alt="image-20220429175336035" style="zoom:80%;" />
 
 <div style="text-align: right">(4)</div>
 
 <p>​        同理，在时间域中，其时间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/6e4bd7149d7a4d74a2f75842eab458f0.png" alt="img">，用来表示连续帧之间关节的轨迹。</p>
 <p>​        其采样函数<img src="https://img-blog.csdnimg.cn/9de33cb77d794c689a697fe65705fba8.png" alt="img">可写成：</p>
-<img src="ST-GCN/image-20220429175407811.png" alt="image-20220429175407811" style="zoom:67%;" />
+<img src="./ST-GCN/image-20220429175407811.png" alt="image-20220429175407811" style="zoom:67%;" />
 
 <div style="text-align: right">(5)</div>
 
 <p>​        其中<img src="https://img-blog.csdnimg.cn/ff58a310517840608555e5c4e538cd8e.png" alt="img">控制时间域卷积的卷积范围，即需要聚合的时间尺度，并且通过简单的映射函数<img src="https://img-blog.csdnimg.cn/c0198c809db043ea8aca222760db5e30.png" alt="img">，将时域邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/4b06fee09d574298b810d0e58c96d8b8.png" alt="img">份：<img src="https://img-blog.csdnimg.cn/72ac13331ac34fbe8904e29b4f545d53.png" alt="img">；故其权重函数<img src="https://img-blog.csdnimg.cn/ac8d3cce9d0849078e1048da4ee4500b.png" alt="img">可写为：</p>
-<img src="ST-GCN/image-20220429175436163.png" alt="image-20220429175436163" style="zoom:67%;" />
+<img src="./ST-GCN/image-20220429175436163.png" alt="image-20220429175436163" style="zoom:67%;" />
 
 <div style="text-align: right">(6)</div>
 
 <p>​        所以，在时间域上的卷积公式可写为：</p>
-<img src="ST-GCN/image-20220429175506787.png" alt="image-20220429175506787" style="zoom:80%;" />
+<img src="./ST-GCN/image-20220429175506787.png" alt="image-20220429175506787" style="zoom:80%;" />
 
 <div style="text-align: right">(7)</div>
 
 <p>​        基于上述描述，我们就可以构建出时空域图卷积的明确的卷积算子。</p>
 <h1 id="五、ST-GCN网络实现"><a href="#五、ST-GCN网络实现" class="headerlink" title="五、ST-GCN网络实现"></a>五、ST-GCN网络实现</h1><p>​        在构建完成时空域的图卷积算子之后，接下来作者便构建了具体实现ST-GCN的具体实现方式：令输入特征图<img src="https://img-blog.csdnimg.cn/6ad8a034e5794a4392eacee5b24ff8df.png" alt="img">，其中<img src="https://img-blog.csdnimg.cn/b452c98b546a4d7d9a5e5631f2f5729e.png" alt="img">分别表示输入通道数、关键帧帧数和关节点数量；为实现ST-GCN，则公式(4)序改写为：</p>
-<img src="ST-GCN/image-20220429175533923.png" alt="image-20220429175533923" style="zoom:67%;" />
+<img src="./ST-GCN/image-20220429175533923.png" alt="image-20220429175533923" style="zoom:67%;" />
 
 <div style="text-align: right">(8)</div>
 
 <p>​        其中：<img src="https://img-blog.csdnimg.cn/3f00c6a18d0d4a9abbe53a60532b7d61.png" alt="img">指第<img src="https://img-blog.csdnimg.cn/5752d8d39f2c4853b43233c697527617.png" alt="img">个分区的归一化邻接矩阵；且<img src="https://img-blog.csdnimg.cn/238b16d6223e469bb56cea97c60d58f0.png" alt="img">为度矩阵，<img src="https://img-blog.csdnimg.cn/414577c61f8647a39cfc260355311311.png" alt="img">设置为0.001，避免空行。<img src="https://img-blog.csdnimg.cn/ac98e882074d40f08e6a9926b7a11b4e.png" alt="img">是<img src="https://img-blog.csdnimg.cn/5b892155a3164efba406dc00dbb2100e.png" alt="img">卷积运算的可训练权重向量。<img src="https://img-blog.csdnimg.cn/46891c2cf8454cdfbd6da66a50ad53e1.png" alt="img">是一个简单的注意力掩膜矩阵，代表每个关节的重要性；<img src="https://img-blog.csdnimg.cn/1d6447529a28449a998759e0b94426e1.png" alt="img">为点积操作。</p>
 <p>​        对于时间卷积而言，其卷积公式(7)可改写为：</p>
-<img src="ST-GCN/image-20220429175559099.png" alt="image-20220429175559099" style="zoom:67%;" />
+<img src="./ST-GCN/image-20220429175559099.png" alt="image-20220429175559099" style="zoom:67%;" />
 
 <div style="text-align: right">(9)</div>
 
