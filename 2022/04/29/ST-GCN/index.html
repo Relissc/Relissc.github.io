@@ -250,12 +250,12 @@
 <div style="text-align: right">(1)</div>
 
 <p>​        其中采样函数$p$，即根据卷积核采样出进行卷积操作的特征点，在骨架图中枚举出该位置$x$的邻居。而权重函数$w$提供进行卷积的权重向量，用来与采样出的 $ c $ 维特征向量计算内积。</p>
-<p>​        在空域图卷积中，空间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/bf023d1ccc8245f091c8c920aa502114.png" alt="img">，若节点<img src="https://img-blog.csdnimg.cn/a8203ac726074995b06ea2c337add1e7.png" alt="img">和<img src="https://img-blog.csdnimg.cn/9b618186e9d74ad690643b149808c40c.png" alt="img">直接相连，则<img src="https://img-blog.csdnimg.cn/8d3ae87747534d6fb18edb37b6c9ef1f.png" alt="img">，其余为0；以此来表示空间域图结构；</p>
-<p>其采样函数<img src="https://img-blog.csdnimg.cn/0e7aa60ab6b8486887ab4478cc5fa166.png" alt="img">可写成：</p>
+<p>​        在空域图卷积中，空间域邻接矩阵为$A_s\in R^{V \times V}$，若节点$i$和$j$直接相连，则$A_{Sij}=1$，其余为0；以此来表示空间域图结构；</p>
+<p>其采样函数$p_s$可写成：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175212819.png" alt="image-20220429175212819" style="zoom:70%;"></p>
 <div style="text-align: right">(2)</div>
 
-<p>​        其中<img src="https://img-blog.csdnimg.cn/fe553ba17026412d8708a1ea6c4eb15a.png" alt="img">表示<img src="https://img-blog.csdnimg.cn/ba62cfa1b1af4cff95ef451cb9113bcf.png" alt="img">到<img src="https://img-blog.csdnimg.cn/355db59e1aa6460799dc3ae197072841.png" alt="img">的最短路径，参数<img src="https://img-blog.csdnimg.cn/abafcf621dde49d2b20af625d50ee553.png" alt="img">控制所采样的邻居图的空间范围。</p>
+<p>​        其中$d(v_{ti},v_{tj})$表示<img src="https://img-blog.csdnimg.cn/ba62cfa1b1af4cff95ef451cb9113bcf.png" alt="img">$v_{tj}$到<img src="https://img-blog.csdnimg.cn/355db59e1aa6460799dc3ae197072841.png" alt="img">$v_{ti}$的最短路径，参数<img src="https://img-blog.csdnimg.cn/abafcf621dde49d2b20af625d50ee553.png" alt="img">控制所采样的邻居图的空间范围。</p>
 <p>​        并且由上述作者将邻居划分为3个子图，并且将每个子图中的每个节点<img src="https://img-blog.csdnimg.cn/997bbb0421af437286960b052c434cc1.png" alt="img">分别通过映射函数<img src="https://img-blog.csdnimg.cn/a04378f307d841c2a0590b57ebcf1eb6.png" alt="img">映射到其子集标签<img src="https://img-blog.csdnimg.cn/52aaf94fdf064f5ea4a6c2270493ac53.png" alt="img">，即将邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/3083fd056128422090ca340cc4f99c99.png" alt="img">、<img src="https://img-blog.csdnimg.cn/e4837ce7d70e49e5a51a9ac19c49e816.png" alt="img">和<img src="https://img-blog.csdnimg.cn/6b2f48df810943009fb1a9b7b7619479.png" alt="img">，分别代表根节点、向心运动特征节点和离心运动特征节点；则其权重函数<img src="https://img-blog.csdnimg.cn/f75a11fc50b745e1b1327acd8d7cca00.png" alt="img">可写为：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175302299.png" alt="image-20220429175302299" style="zoom:70%;"></p>
 <div style="text-align: right">(3)</div>
@@ -396,6 +396,22 @@
 </footer>
 
     </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
 
 </html>
