@@ -255,8 +255,8 @@
 <p><img src="/2022/04/29/ST-GCN/image-20220429175212819.png" alt="image-20220429175212819" style="zoom:70%;"></p>
 <div style="text-align: right">(2)</div>
 
-<p>​        其中$d(v_{ti},v_{tj})$表示<img src="https://img-blog.csdnimg.cn/ba62cfa1b1af4cff95ef451cb9113bcf.png" alt="img">$v_{tj}$到<img src="https://img-blog.csdnimg.cn/355db59e1aa6460799dc3ae197072841.png" alt="img">$v_{ti}$的最短路径，参数<img src="https://img-blog.csdnimg.cn/abafcf621dde49d2b20af625d50ee553.png" alt="img">控制所采样的邻居图的空间范围。</p>
-<p>​        并且由上述作者将邻居划分为3个子图，并且将每个子图中的每个节点<img src="https://img-blog.csdnimg.cn/997bbb0421af437286960b052c434cc1.png" alt="img">分别通过映射函数<img src="https://img-blog.csdnimg.cn/a04378f307d841c2a0590b57ebcf1eb6.png" alt="img">映射到其子集标签<img src="https://img-blog.csdnimg.cn/52aaf94fdf064f5ea4a6c2270493ac53.png" alt="img">，即将邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/3083fd056128422090ca340cc4f99c99.png" alt="img">、<img src="https://img-blog.csdnimg.cn/e4837ce7d70e49e5a51a9ac19c49e816.png" alt="img">和<img src="https://img-blog.csdnimg.cn/6b2f48df810943009fb1a9b7b7619479.png" alt="img">，分别代表根节点、向心运动特征节点和离心运动特征节点；则其权重函数<img src="https://img-blog.csdnimg.cn/f75a11fc50b745e1b1327acd8d7cca00.png" alt="img">可写为：</p>
+<p>​        其中$d(v_{ti},v_{tj})$表示$v_{tj}$到$v_{ti}$的最短路径，参数控$D$制所采样的邻居图的空间范围。</p>
+<p>​        并且由上述作者将邻居划分为3个子图，并且将每个子图中的每个节点$v_{ti}$分别通过映射函数$l_{S_{ti}}$映射到其子集标签，即将邻接矩阵划分为$A_S^0$、$A_S^1$和$A_S^2$，分别代表根节点、向心运动特征节点和离心运动特征节点；则其权重函数$w_s$可写为：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175302299.png" alt="image-20220429175302299" style="zoom:70%;"></p>
 <div style="text-align: right">(3)</div>
 
@@ -264,12 +264,12 @@
 <p><img src="/2022/04/29/ST-GCN/image-20220429175336035.png" alt="image-20220429175336035" style="zoom:80%;"></p>
 <div style="text-align: right">(4)</div>
 
-<p>​        同理，在时间域中，其时间域邻接矩阵为<img src="https://img-blog.csdnimg.cn/6e4bd7149d7a4d74a2f75842eab458f0.png" alt="img">，用来表示连续帧之间关节的轨迹。</p>
-<p>​        其采样函数<img src="https://img-blog.csdnimg.cn/9de33cb77d794c689a697fe65705fba8.png" alt="img">可写成：</p>
+<p>​        同理，在时间域中，其时间域邻接矩阵为$A_T\in R^{T\times T}$，用来表示连续帧之间关节的轨迹。</p>
+<p>​        其采样函数$p_t$可写成：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175407811.png" alt="image-20220429175407811" style="zoom:67%;"></p>
 <div style="text-align: right">(5)</div>
 
-<p>​        其中<img src="https://img-blog.csdnimg.cn/ff58a310517840608555e5c4e538cd8e.png" alt="img">控制时间域卷积的卷积范围，即需要聚合的时间尺度，并且通过简单的映射函数<img src="https://img-blog.csdnimg.cn/c0198c809db043ea8aca222760db5e30.png" alt="img">，将时域邻接矩阵划分为<img src="https://img-blog.csdnimg.cn/4b06fee09d574298b810d0e58c96d8b8.png" alt="img">份：<img src="https://img-blog.csdnimg.cn/72ac13331ac34fbe8904e29b4f545d53.png" alt="img">；故其权重函数<img src="https://img-blog.csdnimg.cn/ac8d3cce9d0849078e1048da4ee4500b.png" alt="img">可写为：</p>
+<p>​        其中$\Gamma$控制时间域卷积的卷积范围，即需要聚合的时间尺度，并且通过简单的映射函数$l_{T_{qi}}$，将时域邻接矩阵划分为$\Gamma $份：$A_T^{-\lfloor\Gamma/2\rfloor},\cdots,A_T^0,\cdots,A_T^{\lfloor\Gamma/2\rfloor}$；故其权重函数$w_t$可写为：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175436163.png" alt="image-20220429175436163" style="zoom:67%;"></p>
 <div style="text-align: right">(6)</div>
 
@@ -278,17 +278,17 @@
 <div style="text-align: right">(7)</div>
 
 <p>​        基于上述描述，我们就可以构建出时空域图卷积的明确的卷积算子。</p>
-<h1 id="五、ST-GCN网络实现"><a href="#五、ST-GCN网络实现" class="headerlink" title="五、ST-GCN网络实现"></a>五、ST-GCN网络实现</h1><p>​        在构建完成时空域的图卷积算子之后，接下来作者便构建了具体实现ST-GCN的具体实现方式：令输入特征图<img src="https://img-blog.csdnimg.cn/6ad8a034e5794a4392eacee5b24ff8df.png" alt="img">，其中<img src="https://img-blog.csdnimg.cn/b452c98b546a4d7d9a5e5631f2f5729e.png" alt="img">分别表示输入通道数、关键帧帧数和关节点数量；为实现ST-GCN，则公式(4)序改写为：</p>
+<h1 id="五、ST-GCN网络实现"><a href="#五、ST-GCN网络实现" class="headerlink" title="五、ST-GCN网络实现"></a>五、ST-GCN网络实现</h1><p>​        在构建完成时空域的图卷积算子之后，接下来作者便构建了具体实现ST-GCN的具体实现方式：令输入特征图$f_{in}\in R^{C\times T\times V}$，其中$C,T,V$分别表示输入通道数、关键帧帧数和关节点数量；为实现ST-GCN，则公式(4)序改写为：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175533923.png" alt="image-20220429175533923" style="zoom:67%;"></p>
 <div style="text-align: right">(8)</div>
 
-<p>​        其中：<img src="https://img-blog.csdnimg.cn/3f00c6a18d0d4a9abbe53a60532b7d61.png" alt="img">指第<img src="https://img-blog.csdnimg.cn/5752d8d39f2c4853b43233c697527617.png" alt="img">个分区的归一化邻接矩阵；且<img src="https://img-blog.csdnimg.cn/238b16d6223e469bb56cea97c60d58f0.png" alt="img">为度矩阵，<img src="https://img-blog.csdnimg.cn/414577c61f8647a39cfc260355311311.png" alt="img">设置为0.001，避免空行。<img src="https://img-blog.csdnimg.cn/ac98e882074d40f08e6a9926b7a11b4e.png" alt="img">是<img src="https://img-blog.csdnimg.cn/5b892155a3164efba406dc00dbb2100e.png" alt="img">卷积运算的可训练权重向量。<img src="https://img-blog.csdnimg.cn/46891c2cf8454cdfbd6da66a50ad53e1.png" alt="img">是一个简单的注意力掩膜矩阵，代表每个关节的重要性；<img src="https://img-blog.csdnimg.cn/1d6447529a28449a998759e0b94426e1.png" alt="img">为点积操作。</p>
+<p>​        其中：$\widetilde{A_S^{(p)}}=D_S^{(p)^{-{\frac 12}}}A_s^{(p)}D_S^{(p)^{\frac 12}}$指第个$p$分区的归一化邻接矩阵；且$D_S^{(p)}=\sum_jA_{S_{ij}}^{(p)}+\alpha$为度矩阵，$\alpha$设置为0.001，避免空行。$W_S^{(p)}\in R^{C_{out}\times C_{in}\times 1\times 1}$是$1\times 1$卷积运算的可训练权重向量。$M^{(p)}\in R^{N\times N}$是一个简单的注意力掩膜矩阵，代表每个关节的重要性；$\bigotimes$为点积操作。</p>
 <p>​        对于时间卷积而言，其卷积公式(7)可改写为：</p>
 <p><img src="/2022/04/29/ST-GCN/image-20220429175559099.png" alt="image-20220429175559099" style="zoom:67%;"></p>
 <div style="text-align: right">(9)</div>
 
-<p>​        其中<img src="https://img-blog.csdnimg.cn/a546dbe12ef04ff9b642db8a45aec8b5.png" alt="img">是卷积核大小为<img src="https://img-blog.csdnimg.cn/81cdc73d4aa54a25b83b2fb2188f42f7.png" alt="img">的2D卷积操作。</p>
-<p>在实现ST-GCN网络时，参数<img src="https://img-blog.csdnimg.cn/a68d78eae4c347a8b3da64e5d0339ba9.png" alt="img">和<img src="https://img-blog.csdnimg.cn/2030be14243e407ca940163a1e78587b.png" alt="img">分别设置为1和9，分别表征空间感受野和时间感受野的大小。然而这两个参数都手工设置，不仅缺乏灵活性，还使得模型的时空感受野都十分有限。</p>
+<p>​        其中$Conv2D[K_t\times 1]$是卷积核大小为$K_t\times 1$的2D卷积操作。</p>
+<p>在实现ST-GCN网络时，参数$D$和$K_t$分别设置为1和9，分别表征空间感受野和时间感受野的大小。然而这两个参数都手工设置，不仅缺乏灵活性，还使得模型的时空感受野都十分有限。</p>
 <h1 id="六、实验"><a href="#六、实验" class="headerlink" title="六、实验"></a>六、实验</h1><h2 id="1、数据集与评估标准"><a href="#1、数据集与评估标准" class="headerlink" title="1、数据集与评估标准"></a>1、数据集与评估标准</h2><h3 id="（1）Kinetics-skeleton数据集："><a href="#（1）Kinetics-skeleton数据集：" class="headerlink" title="（1）Kinetics-skeleton数据集："></a>（1）Kinetics-skeleton数据集：</h3><p>​        该数据集包含从YouTube检索的大约300000个视频片段。且划分240000个视频片段为训练集、20000个视频片段为验证集。这些视频涵盖了多达400个人类动作类，从日常活动、体育场景到复杂的互动动作。每个视频片段大约10秒。该数据集仅提供没有骨架数据的原始视频片段。</p>
 <p>​        为了获得骨架数据，作者首先将所有视频的分辨率调整为340×256，并将帧速率转换为30 FPS。然后，作者使用OpenPose姿态估计工具来估计视频片段中的每个帧上的18个关节的位置。OpenPose给出了像素坐标系中的2D坐标(X，Y)和18个人体关节的置信度得分。因此，作者使用一个元组(X，Y，C)来表示每个关节，一个骨架帧被记录为一个18元组的数组。对于多人情况，作者在每个片段中选择平均联合置信度最高的2个人。</p>
 <h3 id="（2）NTU-RGB-D数据集："><a href="#（2）NTU-RGB-D数据集：" class="headerlink" title="（2）NTU-RGB+D数据集："></a>（2）NTU-RGB+D数据集：</h3><p>​        该数据集包含60个动作类中的56880个视频样本。其中里面的动作可分为三大类：日常动作、交互动作和医疗状况；</p>
