@@ -40,3 +40,7 @@
   text-align: center;
   line-height: 4rem;
 }
+.gt-container {
+  max-width: 780px;
+  margin: auto;
+}
